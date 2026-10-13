@@ -1,0 +1,3 @@
+HELIX Trading Intelligence v0.99.2
+TypeScript files: 289
+TypeScript lines: 29948

@@ -297,10 +297,13 @@ async function restart() {
 
   mkdirSync(dirname(LOG_FILE), { recursive: true });
   const log = openSync(LOG_FILE, "a");
+  // Same Windows "spawn npm ENOENT" class of bug as setup.mjs/with-app-env.mjs:
+  // "npm" on Windows is npm.cmd, which spawn() can't exec directly without a shell.
   const child = spawn("npm", ["run", "preview"], {
     cwd: ROOT,
     detached: true,
     stdio: ["ignore", log, log],
+    shell: process.platform === "win32",
   });
   child.unref();
   writeFileSync(PID_FILE, `${child.pid}\n`);

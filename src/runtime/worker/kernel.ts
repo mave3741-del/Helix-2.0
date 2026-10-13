@@ -1,5 +1,4 @@
 import type { ClaimKind, OrgSnapshot, Task, Worker } from "@/org/types";
-import { scopedMemory } from "@/runtime/memory/firewall";
 import { runTool, toolsForPermissions, type ToolResult } from "@/runtime/tools/runtime";
 import { composeQcPolicy, composeWorkerPolicy } from "./policy";
 
@@ -41,8 +40,9 @@ export function executeLocalWorker(state: OrgSnapshot, worker: Worker, task: Tas
     `brain-local=${task.brainId} scope=${worker.memoryScope}`,
   ];
 
-  const memHit = runTool({ name: "memory.search", input: task.requiredCapability }, { memory: mem, allowed: tools });
-  const check = runTool({ name: "checklist", input: task.title }, { memory: mem, allowed: tools });
+  const toolContext = { memory: mem, allowed: tools, worker: { capabilities: worker.capabilities, toolPermissions: worker.toolPermissions } };
+  const memHit = runTool({ name: "memory.search", input: task.requiredCapability }, toolContext);
+  const check = runTool({ name: "checklist", input: task.title }, toolContext);
   traces.push(`tool memory.search: ${memHit.output.slice(0, 120)}`);
   traces.push("tool checklist: requirements loaded");
 

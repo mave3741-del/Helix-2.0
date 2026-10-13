@@ -1,0 +1,22 @@
+# HELIX Phase 9 external-certification environment template.
+# Replace placeholders only in the deployment environment; do NOT commit secrets.
+HELIX_EXTERNAL_STAGING=true
+DATABASE_URL=<real-postgresql-or-neon-connection-string>
+HELIX_STAGING_CONNECTOR_READY=true
+HELIX_CONNECTOR_PROBE_URL=https://<allowlisted-staging-endpoint>/health
+HELIX_CONNECTOR_PROBE_ALLOWLISTED=true
+HELIX_CONNECTOR_PROBE_TIMEOUT_MS=10000
+HELIX_CONNECTOR_PROBE_MAX_BYTES=2000000
+HELIX_CONNECTOR_PROBE_BEARER_TOKEN=<staging-token-if-required>
+HELIX_DEPLOYMENT_SANDBOX=container
+HELIX_NETWORK_POLICY=allowlist
+HELIX_FILESYSTEM_POLICY=isolated
+HELIX_RAW_KEYS_DENIED=true
+HELIX_PRIVILEGE_RESTRICTED=true
+HELIX_WORKER_BUILTIN_BLOCKED=true
+HELIX_DEPLOYMENT_ATTESTATION=<signed-attestation-token>
+HELIX_DEPLOYMENT_ATTESTATION_PUBLIC_KEY=<public-key-pem>
+HELIX_REVIEWER_ID=<independent-reviewer-id>
+HELIX_IMPLEMENTER_ID=<different-implementer-id>
+HELIX_CONFLICTS_DECLARED=true
+HELIX_LIVE_EXECUTION=false

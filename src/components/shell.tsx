@@ -7,6 +7,8 @@ import {
   Building2,
   CircuitBoard,
   Command,
+  GaugeCircle,
+  LineChart,
   ListTodo,
   Menu,
   OctagonX,
@@ -28,8 +30,9 @@ import { cn, formatCompact } from "@/lib/utils";
 import { drainLiveQueue } from "@/runtime/live-drain";
 import { useOrgStore } from "@/store/org-store";
 
-const NAV = [
+export const NAV = [
   { to: "/", label: "Command", icon: Command, group: "Direct" },
+  { to: "/paper-desk", label: "Paper Desk", icon: LineChart, group: "Direct" },
   { to: "/organization", label: "Organization", icon: Building2, group: "Operate" },
   { to: "/workforce", label: "Workforce", icon: Users, group: "Operate" },
   { to: "/work", label: "Work", icon: ListTodo, group: "Operate" },
@@ -39,6 +42,7 @@ const NAV = [
   { to: "/skills", label: "Skills", icon: CircuitBoard, group: "Assure" },
   { to: "/memory", label: "Memory", icon: BookOpen, group: "Assure" },
   { to: "/governance", label: "Governance", icon: Scale, group: "Govern" },
+  { to: "/readiness", label: "Readiness", icon: GaugeCircle, group: "Govern" },
   { to: "/improve", label: "Improve", icon: Activity, group: "Govern" },
   { to: "/scenarios", label: "Prove", icon: Beaker, group: "Govern" },
 ];
@@ -61,6 +65,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   const [menu, setMenu] = useState(false);
   const [halt, setHalt] = useState(false);
   const pending = approvals.filter((a) => a.status === "pending").length;
+  const commandMode = pathname === "/";
 
   useEffect(() => {
     useOrgStore.getState().setHydrated();
@@ -79,12 +84,12 @@ export function AppShell({ children }: { children: ReactNode }) {
 
   return (
     <div className="min-h-dvh bg-background text-foreground">
-      <aside className="fixed inset-y-0 left-0 z-30 hidden w-56 flex-col border-r border-border bg-background lg:flex">
+      {!commandMode ? <aside className="fixed inset-y-0 left-0 z-30 hidden w-56 flex-col border-r border-border bg-background lg:flex">
         <div className="flex items-center gap-2.5 px-4 py-5">
           <HelixMark />
           <div>
             <p className="text-sm font-medium tracking-tight">Helix</p>
-            <p className="font-mono text-[10px] tracking-[0.16em] text-muted uppercase">Org OS</p>
+            <p className="font-mono text-[10px] tracking-[0.16em] text-muted uppercase">Trading intelligence</p>
           </div>
         </div>
         <nav className="flex-1 overflow-y-auto px-2 pb-4">
@@ -120,9 +125,9 @@ export function AppShell({ children }: { children: ReactNode }) {
           <p className="truncate text-xs text-muted">{identity.ownerName}</p>
           <p className="font-mono text-[10px] text-muted tabular-nums">epoch {epoch}</p>
         </div>
-      </aside>
+      </aside> : null}
 
-      <header className="sticky top-0 z-20 flex h-14 items-center gap-2 border-b border-border bg-background/95 px-3 lg:ml-56 lg:px-6">
+      {!commandMode ? <header className="sticky top-0 z-20 flex h-14 items-center gap-2 border-b border-border bg-background/95 px-3 lg:ml-56 lg:px-6">
         <button
           className="flex size-11 items-center justify-center rounded-md lg:hidden"
           aria-label="Open menu"
@@ -160,13 +165,13 @@ export function AppShell({ children }: { children: ReactNode }) {
             <OctagonX /> Halt
           </Button>
         </div>
-      </header>
+      </header> : null}
 
-      <main className="lg:ml-56">
-        <div className="mx-auto max-w-7xl px-3 pb-24 pt-5 sm:px-6 sm:pt-6 lg:pb-10">{children}</div>
+      <main className={commandMode ? "" : "lg:ml-56"}>
+        <div className={commandMode ? "min-h-dvh" : "mx-auto max-w-7xl px-3 pb-24 pt-5 sm:px-6 sm:pt-6 lg:pb-10"}>{children}</div>
       </main>
 
-      <nav className="fixed inset-x-0 bottom-0 z-20 grid grid-cols-5 border-t border-border bg-background lg:hidden">
+      {!commandMode ? <nav className="fixed inset-x-0 bottom-0 z-20 grid grid-cols-5 border-t border-border bg-background lg:hidden">
         {MOBILE_TABS.map((n) => {
           const active = n.to === "/" ? pathname === "/" : pathname.startsWith(n.to);
           const Icon = n.icon;
@@ -191,7 +196,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           <CircuitBoard className="size-4" />
           More
         </button>
-      </nav>
+      </nav> : null}
 
       {menu ? (
         <div className="fixed inset-0 z-40 lg:hidden">

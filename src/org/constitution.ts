@@ -51,8 +51,8 @@ export const CONSTITUTION = [
   },
   {
     n: 11,
-    title: "High-impact approval",
-    rule: "High-impact irreversible actions require explicit Owner approval.",
+    title: "Capital-budget approval",
+    rule: "The Owner approves the live trading capital budget/window. Individual trades proceed autonomously only within hard policy and risk limits; the risk engine may veto any trade.",
   },
   {
     n: 12,
@@ -93,7 +93,7 @@ export const SYSTEMS = [
   { id: "fallback", name: "Automatic fallback", spec: "22, 23" },
   { id: "skills", name: "Skill factory", spec: "24, 25" },
   { id: "testing", name: "Testing organization", spec: "26, 27, 28, 29" },
-  { id: "ceo", name: "CEO & advisory", spec: "33, 34" },
+  { id: "ceo", name: "Orion & advisory", spec: "33, 34" },
   { id: "coordination", name: "Cross-department coordination", spec: "36, 57" },
   { id: "resources", name: "Resource management", spec: "40" },
   { id: "improve", name: "Controlled self-improvement", spec: "43, 44" },

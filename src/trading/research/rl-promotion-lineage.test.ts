@@ -1,0 +1,10 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { InMemoryRlPromotionLineage, verifyRlPromotionLineage } from './rl-promotion-lineage.ts';
+import { buildRlPromotionEntry } from './rl-promotion-ledger.ts';
+const h=(s:string)=>s.replace(/[^a-f0-9]/gi,'a').padEnd(64,'0').slice(0,64);
+const c=(id:string,eligible=true)=>({candidateId:id,experimentId:`exp-${id}`,environmentHash:h('env'),algorithm:'ppo',seeds:[1,2],configHash:h('cfg'),evidence:{oosHash:h('oos'),robustnessHash:h('rob'),stressHashes:[h('stress')]},gateEligible:eligible,rejectionReasons:eligible?[]:['gate_failed'],createdAt:1});
+test('promotion establishes champion lineage and preserves hash chain',()=>{const a=buildRlPromotionEntry(c('a'),null); const b=buildRlPromotionEntry(c('b'),a.entryHash); const l=new InMemoryRlPromotionLineage(); const e1=l.promote(a,'first',10); const e2=l.promote(b,'better',20); assert.equal(e1.previousChampionId,null); assert.equal(e2.previousChampionId,'a'); assert.equal(l.state().championId,'b'); assert.equal(verifyRlPromotionLineage(l.list()),true);});
+test('challenger registration is bound to ledger evidence and champion state',()=>{const a=buildRlPromotionEntry(c('a'),null); const l=new InMemoryRlPromotionLineage(); l.promote(a,undefined,10); const e=l.setChallenger('x',h('ledger'),20); assert.equal(e.previousChampionId,'a'); assert.equal(l.state().challengerId,'x'); assert.equal(verifyRlPromotionLineage(l.list()),true);});
+test('rollback requires current champion and replacement identity',()=>{const a=buildRlPromotionEntry(c('a'),null); const l=new InMemoryRlPromotionLineage(); l.promote(a,undefined,10); const rb=l.rollback(a,'fallback','regression',20); assert.equal(rb.decision,'rolled_back'); assert.equal(l.state().championId,'fallback'); assert.equal(verifyRlPromotionLineage(l.list()),true);});
+test('tampering breaks lineage verification',()=>{const a=buildRlPromotionEntry(c('a'),null); const l=new InMemoryRlPromotionLineage(); l.promote(a,undefined,10); const x=l.list(); x[0]!.candidateId='evil'; assert.equal(verifyRlPromotionLineage(x),false);});

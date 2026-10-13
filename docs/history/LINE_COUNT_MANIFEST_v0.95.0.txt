@@ -1,0 +1,6 @@
+HELIX v0.95.0 line-count manifest
+TS/TSX files: 309
+TS/TSX lines: 30289
+JS/MJS files: 43
+JS/MJS lines: 5474
+Combined TS/TSX+JS/MJS lines: 35763

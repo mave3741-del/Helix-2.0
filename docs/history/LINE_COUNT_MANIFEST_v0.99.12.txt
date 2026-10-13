@@ -1,0 +1,4 @@
+HELIX v0.99.12 fixed source count
+Rule: count .ts, .tsx, .mts, .mjs, .js, .jsx; exclude node_modules, .git, artifacts, dist, coverage.
+Source files: 397
+Source lines: 40350

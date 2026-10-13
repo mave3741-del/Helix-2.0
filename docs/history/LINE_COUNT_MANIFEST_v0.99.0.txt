@@ -1,0 +1,5 @@
+HELIX v0.99.0 Phase 8.10 source measurement
+Scope: src/**/*.ts, src/**/*.tsx, src/**/*.mts, src/**/*.mjs
+Source files (TS/TSX): 321
+Total lines (TS/TSX/MTS/MJS): 31,963
+Line counts are measurement metadata, not an engineering target.

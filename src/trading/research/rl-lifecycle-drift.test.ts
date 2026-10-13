@@ -1,0 +1,3 @@
+import test from 'node:test'; import assert from 'node:assert/strict'; import {evaluateRlDrift} from './rl-lifecycle-drift.ts'; const h='a'.repeat(64);
+test('drift remains healthy below threshold',()=>assert.equal(evaluateRlDrift({championId:'c',baselineHash:h,currentHash:h,baselineReturn:10,currentReturn:9.5,maxDegradationRate:.1,now:1}).decision,'healthy'));
+test('drift requests reassessment then rollback when severe',()=>{assert.equal(evaluateRlDrift({championId:'c',baselineHash:h,currentHash:h,baselineReturn:10,currentReturn:9,maxDegradationRate:.1,now:1}).decision,'reassess'); assert.equal(evaluateRlDrift({championId:'c',baselineHash:h,currentHash:h,baselineReturn:10,currentReturn:8,maxDegradationRate:.1,now:1}).decision,'rollback');});

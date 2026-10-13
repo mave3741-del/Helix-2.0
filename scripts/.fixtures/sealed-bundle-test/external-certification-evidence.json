@@ -1,0 +1,24 @@
+{
+  "schema": 2,
+  "gate": "phase8.1-external-certification",
+  "packageVersion": "0.99.6",
+  "environment": {
+    "node": "v22.16.0",
+    "platform": "linux",
+    "liveExecution": false
+  },
+  "prerequisites": {
+    "status": "READY",
+    "reasons": []
+  },
+  "execution": [
+    {
+      "name": "release:integrity",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "ok"
+    }
+  ],
+  "status": "PASS",
+  "evidenceHash": "280b3ad87b8d00b6467c134ba0eb6ca2cb01537747af9c0a48326577d24f772c"
+}

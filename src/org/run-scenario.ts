@@ -5,7 +5,6 @@ import {
   grantApproval,
   issueObjective,
   setBrainAvailable,
-  setLiveMode,
   setOrgStatus,
   setRoutingMode,
   tick,
@@ -59,7 +58,7 @@ export function runScenario(state: OrgSnapshot, id: string): ScenarioResult {
         const tasks = Object.values(state.tasks).filter((t) => t.objectiveId === oid);
         if (!obj) return failReturn(result, "Objective missing");
         if (!tasks.length) return failReturn(result, "No tasks created");
-        pass(result, `CEO strategy set (${tasks.length} tasks)`);
+        pass(result, `Orion strategy set (${tasks.length} tasks)`);
         if (tasks.some((t) => t.workerId || t.status === "delivered"))
           pass(result, "Workers assigned");
         if (tasks.some((t) => t.status === "delivered")) pass(result, "Work delivered");
@@ -343,7 +342,7 @@ export function runScenario(state: OrgSnapshot, id: string): ScenarioResult {
   } catch (err) {
     return failReturn(result, err instanceof Error ? err.message : "Scenario threw");
   } finally {
-    if (state.runtime) state.runtime.liveMode = prevLive ?? true;
+    if (state.runtime) state.runtime.liveMode = prevLive ?? false;
   }
 
   if (result.status === "running") {

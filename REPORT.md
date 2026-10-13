@@ -1,3 +1,5 @@
+> **Current identity notice (v0.99.25):** This package is the HELIX Trading Intelligence project. The historical “Helix 2.0 — AI Organization OS” report text below is retained as legacy project history and must not be interpreted as the current trading-system mission or certification state. Live execution remains disabled.
+
 # Helix 2.0 — AI Organization OS
 
 **Project report**  
@@ -278,3 +280,13 @@ Then:
 | GitHub source | https://github.com/mave3741-del/helix |
 
 Helix is an operating layer for a coordinated organization. Models can be swapped. Memory, goals, and quality remain with Helix.
+
+## v0.7 implementation notes
+- Added `src/trading/runtime/event-bus.ts`: idempotent server-side trading event bus.
+- Added `src/trading/runtime/paper-exchange.ts`: bid/ask paper fills, fees, positions and equity tracking.
+- Added `src/trading/runtime/runtime.ts`: process-local server trading runtime with capital envelope, hard risk gate and kill switch.
+- Added `src/trading/data/adapters.ts`: deterministic replay adapter plus WebSocket adapter boundary.
+- Added `src/trading/data/registry.ts`: capability/latency-aware data-source registry and adapter registry.
+- Added `src/trading/research/evolution.ts`: strategy candidate/challenger/champion/retired lifecycle with lineage.
+- Focused trading runtime tests: 11/11 passing with Node's TypeScript strip-only runner.
+- Full `npm ci` / application build remains unverified in this environment because dependency installation timed out.

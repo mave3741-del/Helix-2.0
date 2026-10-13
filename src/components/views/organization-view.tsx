@@ -19,13 +19,13 @@ export function OrganizationView() {
         <p className="font-mono text-[11px] tracking-[0.2em] text-muted uppercase">Hierarchy</p>
         <h1 className="mt-1 text-3xl font-medium tracking-tight">One organization.</h1>
         <p className="mt-2 max-w-2xl text-sm text-muted">
-          Owner → CEO → executives → managers → supervisors → teams → 1,000 workers. Leadership
+          Owner → Orion → executives → managers → supervisors → teams → 1,000 workers. Leadership
           succession is automatic. Departments are not silos.
         </p>
       </div>
 
       <Panel>
-        <PanelTitle kicker="Apex" title="Owner and CEO" />
+        <PanelTitle kicker="HELIX" title="Owner and Orion" />
         <div className="grid gap-3 sm:grid-cols-2">
           <div className="rounded-lg bg-card-elevated p-4">
             <p className="font-mono text-[10px] tracking-[0.16em] text-muted uppercase">Owner</p>

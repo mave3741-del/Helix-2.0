@@ -1,0 +1,146 @@
+name: Helix CI
+
+on:
+  workflow_dispatch:
+  push:
+    branches: ["**"]
+  pull_request:
+
+jobs:
+  certify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Verify CI environment
+        run: npm run ci:environment
+
+      - name: Install locked dependencies
+        run: npm ci
+
+      - name: Verify migration integrity
+        run: npm run migration:integrity
+
+      - name: Run Phase 6 certification gate
+        run: npm run phase6:certify
+
+      - name: Run Phase 7 paper-operations gate
+        run: npm run phase7:paper-ops
+
+      - name: Run Phase 7 control-room gate
+        run: npm run phase7:control-room
+
+      - name: Run Phase 7 canary-cohort gate
+        run: npm run phase7:canary-cohorts
+
+      - name: Run full certification
+        run: npm run ci:certify
+
+  production-verify:
+    if: ${{ github.event_name == 'workflow_dispatch' }}
+    needs: certify
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Verify CI environment
+        run: npm run ci:environment
+      - name: Install locked dependencies
+        run: npm ci
+      - name: Verify staging credentials are configured
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          test -n "$DATABASE_URL"
+      - name: Apply staging migrations
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: npm run db:migrate
+      - name: Verify staging database
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: npm run db:verify
+      - name: Verify database immutability contract
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: node scripts/db-immutability-verify.mjs
+
+
+  external-certification:
+    if: ${{ github.event_name == 'workflow_dispatch' }}
+    needs: certify
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Verify CI environment
+        run: npm run ci:environment
+      - name: Install locked dependencies
+        run: npm ci
+      - name: Verify external certification inputs are configured
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          HELIX_STAGING_CONNECTOR_READY: ${{ secrets.HELIX_STAGING_CONNECTOR_READY }}
+          HELIX_REVIEWER_ID: ${{ secrets.HELIX_REVIEWER_ID }}
+          HELIX_IMPLEMENTER_ID: ${{ secrets.HELIX_IMPLEMENTER_ID }}
+          HELIX_DEPLOYMENT_ATTESTATION: ${{ secrets.HELIX_DEPLOYMENT_ATTESTATION }}
+          HELIX_DEPLOYMENT_ATTESTATION_PUBLIC_KEY: ${{ secrets.HELIX_DEPLOYMENT_ATTESTATION_PUBLIC_KEY }}
+          HELIX_CONNECTOR_PROBE_URL: ${{ secrets.HELIX_CONNECTOR_PROBE_URL }}
+        run: |
+          test -n "$DATABASE_URL"
+          test "$HELIX_STAGING_CONNECTOR_READY" = true
+          test -n "$HELIX_REVIEWER_ID"
+          test -n "$HELIX_IMPLEMENTER_ID"
+          test -n "$HELIX_DEPLOYMENT_ATTESTATION"
+          test -n "$HELIX_DEPLOYMENT_ATTESTATION_PUBLIC_KEY"
+          test -n "$HELIX_CONNECTOR_PROBE_URL"
+      - name: Run external certification
+        env:
+          HELIX_EXTERNAL_STAGING: 'true'
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          HELIX_STAGING_CONNECTOR_READY: ${{ secrets.HELIX_STAGING_CONNECTOR_READY }}
+          HELIX_DEPLOYMENT_SANDBOX: ${{ secrets.HELIX_DEPLOYMENT_SANDBOX }}
+          HELIX_NETWORK_POLICY: ${{ secrets.HELIX_NETWORK_POLICY }}
+          HELIX_FILESYSTEM_POLICY: ${{ secrets.HELIX_FILESYSTEM_POLICY }}
+          HELIX_RAW_KEYS_DENIED: ${{ secrets.HELIX_RAW_KEYS_DENIED }}
+          HELIX_PRIVILEGE_RESTRICTED: ${{ secrets.HELIX_PRIVILEGE_RESTRICTED }}
+          HELIX_WORKER_BUILTIN_BLOCKED: ${{ secrets.HELIX_WORKER_BUILTIN_BLOCKED }}
+          HELIX_REVIEWER_ID: ${{ secrets.HELIX_REVIEWER_ID }}
+          HELIX_IMPLEMENTER_ID: ${{ secrets.HELIX_IMPLEMENTER_ID }}
+          HELIX_CONFLICTS_DECLARED: ${{ secrets.HELIX_CONFLICTS_DECLARED }}
+          HELIX_DEPLOYMENT_ATTESTATION: ${{ secrets.HELIX_DEPLOYMENT_ATTESTATION }}
+          HELIX_DEPLOYMENT_ATTESTATION_PUBLIC_KEY: ${{ secrets.HELIX_DEPLOYMENT_ATTESTATION_PUBLIC_KEY }}
+          HELIX_CONNECTOR_PROBE_URL: ${{ secrets.HELIX_CONNECTOR_PROBE_URL }}
+          HELIX_CONNECTOR_PROBE_ALLOWLISTED: 'true'
+          HELIX_CONNECTOR_PROBE_TIMEOUT_MS: '10000'
+          HELIX_CONNECTOR_PROBE_MAX_BYTES: '2000000'
+          HELIX_CONNECTOR_PROBE_BEARER_TOKEN: ${{ secrets.HELIX_CONNECTOR_PROBE_BEARER_TOKEN }}
+          HELIX_LIVE_EXECUTION: 'false'
+        run: npm run external:certify
+      - name: Upload certification evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: helix-external-certification-evidence
+          path: artifacts/external-certification-evidence.json
+          if-no-files-found: warn

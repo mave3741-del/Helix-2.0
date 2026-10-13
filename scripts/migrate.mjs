@@ -13,6 +13,7 @@
  * the same files at startup instead (see src/lib/db.ts).
  */
 import { readdir, readFile } from "node:fs/promises";
+import { createHash } from "node:crypto";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 import pg from "pg";
@@ -48,18 +49,30 @@ async function main() {
     await client.query(
       "CREATE TABLE IF NOT EXISTS _migrations (name TEXT PRIMARY KEY, applied_at TIMESTAMPTZ NOT NULL DEFAULT now())",
     );
-    const applied = (await client.query("SELECT name FROM _migrations")).rows.map(
-      (r) => r.name,
-    );
+    await client.query("ALTER TABLE _migrations ADD COLUMN IF NOT EXISTS content_sha256 TEXT");
+    const appliedRows = (await client.query("SELECT name, content_sha256 FROM _migrations")).rows;
+    const applied = appliedRows.map((r) => r.name);
 
+    for (const row of appliedRows) {
+      if (!row.content_sha256) continue;
+      const filePath = join(migrationsDir, row.name);
+      try {
+        const current = createHash("sha256").update(await readFile(filePath)).digest("hex");
+        if (current !== String(row.content_sha256)) throw new Error(`migration_content_drift:${row.name}`);
+      } catch (err) {
+        if (String(err?.message ?? err).startsWith("migration_content_drift:")) throw err;
+        throw new Error(`migration_file_missing:${row.name}`);
+      }
+    }
     let count = 0;
     for (const { name } of pendingMigrations(entries, applied)) {
       const text = await readFile(join(migrationsDir, name), "utf8");
+      const contentSha256 = createHash("sha256").update(text).digest("hex");
       try {
         await client.query("BEGIN");
         // pg's simple-query protocol runs a whole multi-statement file at once.
         await client.query(text);
-        await client.query("INSERT INTO _migrations (name) VALUES ($1)", [name]);
+        await client.query("INSERT INTO _migrations (name, content_sha256) VALUES ($1, $2)", [name, contentSha256]);
         await client.query("COMMIT");
       } catch (err) {
         console.error(`[migrate] error applying ${name}`);
@@ -72,6 +85,12 @@ async function main() {
       }
       console.log(`[migrate] applied ${name}`);
       count += 1;
+    }
+    for (const row of appliedRows.filter((x) => !x.content_sha256)) {
+      const filePath = join(migrationsDir, row.name);
+      const text = await readFile(filePath, "utf8");
+      const contentSha256 = createHash("sha256").update(text).digest("hex");
+      await client.query("UPDATE _migrations SET content_sha256=$2 WHERE name=$1 AND content_sha256 IS NULL", [row.name, contentSha256]);
     }
     console.log(count ? `[migrate] done — ${count} migration(s) applied.` : "[migrate] up to date.");
   } finally {

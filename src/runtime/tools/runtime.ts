@@ -1,7 +1,9 @@
 import { redactSecrets } from "@/runtime/memory/firewall";
+import { isNativeToolAllowedForWorker } from "./capability-router.ts";
+import { executeGeneratedTool } from "./factory.ts";
 import type { MemoryItem } from "@/org/types";
 
-export type ToolName = "memory.search" | "calculator" | "checklist" | "refuse";
+export type ToolName = "memory.search" | "calculator" | "checklist" | "refuse" | "native.market.snapshot" | "native.technical.signal" | "native.risk.check" | "native.position.size" | "native.backtest" | "native.strategy.score" | "native.paper.order" | "native.rsi" | "native.atr" | "native.zscore" | "native.whale.signal" | "native.regime.classify" | "native.pit.validate" | "native.data.quality" | "native.strategy.mutate" | "native.portfolio.check";
 
 export interface ToolCall {
   name: ToolName;
@@ -24,6 +26,9 @@ const ALLOWED: Record<string, ToolName[]> = {
   linter: ["checklist", "refuse"],
   scanner: ["checklist", "refuse"],
   calculator: ["calculator", "refuse"],
+  trading: ["native.market.snapshot", "native.technical.signal", "native.backtest", "native.strategy.score", "native.paper.order", "native.rsi", "native.atr", "native.zscore", "native.whale.signal", "native.regime.classify", "native.pit.validate", "native.data.quality", "native.strategy.mutate", "native.portfolio.check", "refuse"],
+  risk: ["native.risk.check", "native.position.size", "refuse"],
+  research: ["native.backtest", "native.strategy.score", "native.technical.signal", "native.rsi", "native.atr", "native.zscore", "native.whale.signal", "native.regime.classify", "native.pit.validate", "native.data.quality", "native.strategy.mutate", "native.portfolio.check", "refuse"],
 };
 
 export function toolsForPermissions(perms: string[]): ToolName[] {
@@ -39,7 +44,7 @@ export function toolsForPermissions(perms: string[]): ToolName[] {
 
 export function runTool(
   call: ToolCall,
-  ctx: { memory: MemoryItem[]; allowed: ToolName[] },
+  ctx: { memory: MemoryItem[]; allowed: ToolName[]; worker?: { capabilities: string[]; toolPermissions: string[] } },
 ): ToolResult {
   if (!ctx.allowed.includes(call.name)) {
     return { name: call.name, ok: false, output: "Permission denied for tool" };
@@ -71,6 +76,18 @@ export function runTool(
       ok: true,
       output: hits.length ? hits.join(" | ") : "No authorized matching memory",
     };
+  }
+  if (call.name.startsWith("native.") && ctx.worker && !isNativeToolAllowedForWorker(call.name, ctx.worker)) {
+    return { name: call.name, ok: false, output: "Native tool denied by worker capability policy" };
+  }
+  if (call.name.startsWith("native.")) {
+    try {
+      const parsed = JSON.parse(call.input || "{}");
+      const result = executeGeneratedTool(call.name, parsed);
+      return { name: call.name, ok: true, output: JSON.stringify(result), };
+    } catch (error) {
+      return { name: call.name, ok: false, output: error instanceof Error ? error.message : "native tool failed" };
+    }
   }
   if (call.name === "checklist") {
     const items = [

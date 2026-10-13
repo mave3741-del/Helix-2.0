@@ -1,0 +1,5 @@
+HELIX v0.98.4
+Source code lines (src TS/TSX/JS/JSX): 31389
+TypeScript/TSX/JS/JSX source files: 316
+Test files (*.test.ts): 106
+Counting method: raw source line count under src; generated/build/dependency files excluded.

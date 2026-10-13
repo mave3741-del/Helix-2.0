@@ -1,0 +1,4 @@
+HELIX v0.98.6 source line count
+combined_source_lines=31684
+ts_tsx_files=318
+test_files=107

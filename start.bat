@@ -1,21 +1,26 @@
 @echo off
+setlocal
 cd /d "%~dp0"
-where node >nul 2>nul
+
+where npm.cmd >nul 2>&1
 if errorlevel 1 (
   echo Node.js is required. Install it from https://nodejs.org then run this again.
   pause
   exit /b 1
 )
-echo Installing Helix dependencies...
-call npm install
+
+call npm run setup
 if errorlevel 1 (
-  echo npm install failed.
   pause
   exit /b 1
 )
+
 echo.
-echo Starting Helix. Open http://localhost:8080 in your browser.
-echo Close this window to stop the app.
+echo Starting HELIX. Open http://localhost:8080 in your browser.
+echo Press Ctrl+C to stop.
+echo (Want it as a desktop app instead of a browser tab? Run desktop.bat)
 echo.
 call npm run dev
-pause
+set "RC=%ERRORLEVEL%"
+if not "%RC%"=="0" pause
+endlocal & exit /b %RC%

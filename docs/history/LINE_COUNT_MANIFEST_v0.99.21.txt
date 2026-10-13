@@ -1,0 +1,6 @@
+HELIX Trading Intelligence — line-count manifest
+Release: v0.99.21
+Phase: 10.5
+Rule: count files with .ts, .tsx, .mts, .mjs, .js, .jsx; exclude node_modules, .git, dist, build, coverage, .vite.
+Source files: 415
+Source lines: 42217

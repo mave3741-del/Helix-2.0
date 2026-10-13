@@ -1,0 +1,2 @@
+import test from 'node:test'; import assert from 'node:assert/strict'; import {activateRlEmergencyStop,requireRlNotStopped} from './rl-lifecycle-emergency-stop.ts';
+test('emergency stop is deterministic and blocks lifecycle continuation',()=>{const s=activateRlEmergencyStop('integrity failure','integrity',1); assert.match(s.evidenceHash,/^[a-f0-9]{64}$/); assert.throws(()=>requireRlNotStopped(s),/emergency_stop_active/);});

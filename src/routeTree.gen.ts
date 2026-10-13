@@ -15,7 +15,9 @@ import { Route as GovernanceRouteImport } from './routes/governance'
 import { Route as ImproveRouteImport } from './routes/improve'
 import { Route as MemoryRouteImport } from './routes/memory'
 import { Route as OrganizationRouteImport } from './routes/organization'
+import { Route as PaperDeskRouteImport } from './routes/paper-desk'
 import { Route as QualityRouteImport } from './routes/quality'
+import { Route as ReadinessRouteImport } from './routes/readiness'
 import { Route as ScenariosRouteImport } from './routes/scenarios'
 import { Route as SkillsRouteImport } from './routes/skills'
 import { Route as ToolsRouteImport } from './routes/tools'
@@ -52,9 +54,19 @@ const OrganizationRoute = OrganizationRouteImport.update({
   path: '/organization',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PaperDeskRoute = PaperDeskRouteImport.update({
+  id: '/paper-desk',
+  path: '/paper-desk',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const QualityRoute = QualityRouteImport.update({
   id: '/quality',
   path: '/quality',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ReadinessRoute = ReadinessRouteImport.update({
+  id: '/readiness',
+  path: '/readiness',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ScenariosRoute = ScenariosRouteImport.update({
@@ -90,7 +102,9 @@ export interface FileRoutesByFullPath {
   '/improve': typeof ImproveRoute
   '/memory': typeof MemoryRoute
   '/organization': typeof OrganizationRoute
+  '/paper-desk': typeof PaperDeskRoute
   '/quality': typeof QualityRoute
+  '/readiness': typeof ReadinessRoute
   '/scenarios': typeof ScenariosRoute
   '/skills': typeof SkillsRoute
   '/tools': typeof ToolsRoute
@@ -104,7 +118,9 @@ export interface FileRoutesByTo {
   '/improve': typeof ImproveRoute
   '/memory': typeof MemoryRoute
   '/organization': typeof OrganizationRoute
+  '/paper-desk': typeof PaperDeskRoute
   '/quality': typeof QualityRoute
+  '/readiness': typeof ReadinessRoute
   '/scenarios': typeof ScenariosRoute
   '/skills': typeof SkillsRoute
   '/tools': typeof ToolsRoute
@@ -119,7 +135,9 @@ export interface FileRoutesById {
   '/improve': typeof ImproveRoute
   '/memory': typeof MemoryRoute
   '/organization': typeof OrganizationRoute
+  '/paper-desk': typeof PaperDeskRoute
   '/quality': typeof QualityRoute
+  '/readiness': typeof ReadinessRoute
   '/scenarios': typeof ScenariosRoute
   '/skills': typeof SkillsRoute
   '/tools': typeof ToolsRoute
@@ -135,7 +153,9 @@ export interface FileRouteTypes {
     | '/improve'
     | '/memory'
     | '/organization'
+    | '/paper-desk'
     | '/quality'
+    | '/readiness'
     | '/scenarios'
     | '/skills'
     | '/tools'
@@ -149,7 +169,9 @@ export interface FileRouteTypes {
     | '/improve'
     | '/memory'
     | '/organization'
+    | '/paper-desk'
     | '/quality'
+    | '/readiness'
     | '/scenarios'
     | '/skills'
     | '/tools'
@@ -163,7 +185,9 @@ export interface FileRouteTypes {
     | '/improve'
     | '/memory'
     | '/organization'
+    | '/paper-desk'
     | '/quality'
+    | '/readiness'
     | '/scenarios'
     | '/skills'
     | '/tools'
@@ -178,7 +202,9 @@ export interface RootRouteChildren {
   ImproveRoute: typeof ImproveRoute
   MemoryRoute: typeof MemoryRoute
   OrganizationRoute: typeof OrganizationRoute
+  PaperDeskRoute: typeof PaperDeskRoute
   QualityRoute: typeof QualityRoute
+  ReadinessRoute: typeof ReadinessRoute
   ScenariosRoute: typeof ScenariosRoute
   SkillsRoute: typeof SkillsRoute
   ToolsRoute: typeof ToolsRoute
@@ -230,11 +256,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OrganizationRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/paper-desk': {
+      id: '/paper-desk'
+      path: '/paper-desk'
+      fullPath: '/paper-desk'
+      preLoaderRoute: typeof PaperDeskRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/quality': {
       id: '/quality'
       path: '/quality'
       fullPath: '/quality'
       preLoaderRoute: typeof QualityRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/readiness': {
+      id: '/readiness'
+      path: '/readiness'
+      fullPath: '/readiness'
+      preLoaderRoute: typeof ReadinessRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/scenarios': {
@@ -282,7 +322,9 @@ const rootRouteChildren: RootRouteChildren = {
   ImproveRoute: ImproveRoute,
   MemoryRoute: MemoryRoute,
   OrganizationRoute: OrganizationRoute,
+  PaperDeskRoute: PaperDeskRoute,
   QualityRoute: QualityRoute,
+  ReadinessRoute: ReadinessRoute,
   ScenariosRoute: ScenariosRoute,
   SkillsRoute: SkillsRoute,
   ToolsRoute: ToolsRoute,

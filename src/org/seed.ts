@@ -1,4 +1,5 @@
 import { mulberry32, padId } from "@/lib/utils";
+import { tradingProfile } from "@/trading/workforce";
 import { makeAgent } from "@/runtime/worker/profile";
 
 import {
@@ -185,6 +186,7 @@ export function seedOrganization(now = Date.now()): OrgSnapshot {
     execIds.push(id);
     const def = EXEC_TITLES[i - 1];
     const caps = pickCaps("executive", def.dept, rand);
+    const trade = tradingProfile(i - 1);
     workers[id] = withAgent({
       id,
       name: workerName(i - 1),
@@ -194,7 +196,7 @@ export function seedOrganization(now = Date.now()): OrgSnapshot {
       supervisorId: null,
       managerId: null,
       executiveId: id,
-      capabilities: caps,
+      capabilities: Array.from(new Set([...caps, ...trade.capabilities, "trading"])),
       permissions: permissionsFor("executive"),
       status: "available",
       currentAssignment: null,
@@ -209,6 +211,9 @@ export function seedOrganization(now = Date.now()): OrgSnapshot {
       disabledReason: null,
       lastActiveAt: now,
     });
+    workers[id].agent.specialization = trade.name;
+    workers[id].agent.methodology = trade.methods;
+    workers[id].agent.lastTrace = `Trading specialization: ${trade.name}`;
     workerOrder.push(id);
   }
 
@@ -217,6 +222,7 @@ export function seedOrganization(now = Date.now()): OrgSnapshot {
     const id = `W-${padId(9 + idx)}`;
     managerIds.push(id);
     const execId = execIds.find((e) => workers[e].departmentId === d.id) ?? execIds[idx % 8];
+    const trade = tradingProfile(8 + idx);
     const caps = pickCaps("manager", d.id, rand);
     workers[id] = withAgent({
       id,
@@ -227,7 +233,7 @@ export function seedOrganization(now = Date.now()): OrgSnapshot {
       supervisorId: null,
       managerId: id,
       executiveId: execId,
-      capabilities: caps,
+      capabilities: Array.from(new Set([...caps, ...trade.capabilities, "trading"])),
       permissions: permissionsFor("manager"),
       status: "available",
       currentAssignment: null,
@@ -242,6 +248,9 @@ export function seedOrganization(now = Date.now()): OrgSnapshot {
       disabledReason: null,
       lastActiveAt: now,
     });
+    workers[id].agent.specialization = trade.name;
+    workers[id].agent.methodology = trade.methods;
+    workers[id].agent.lastTrace = `Trading specialization: ${trade.name}`;
     workerOrder.push(id);
   });
 
@@ -253,6 +262,7 @@ export function seedOrganization(now = Date.now()): OrgSnapshot {
       const id = `W-${padId(cursor++)}`;
       deptSup.push(id);
       supervisorIds.push(id);
+      const trade = tradingProfile(20 + di * 4 + t);
       const caps = pickCaps("supervisor", d.id, rand);
       workers[id] = withAgent({
         id,
@@ -263,7 +273,7 @@ export function seedOrganization(now = Date.now()): OrgSnapshot {
         supervisorId: id,
         managerId: managerIds[di],
         executiveId: workers[managerIds[di]].executiveId,
-        capabilities: caps,
+        capabilities: Array.from(new Set([...caps, ...trade.capabilities, "trading"])),
         permissions: permissionsFor("supervisor"),
         status: "available",
         currentAssignment: null,
@@ -278,6 +288,9 @@ export function seedOrganization(now = Date.now()): OrgSnapshot {
         disabledReason: null,
         lastActiveAt: now,
       });
+      workers[id].agent.specialization = trade.name;
+      workers[id].agent.methodology = trade.methods;
+      workers[id].agent.lastTrace = `Trading specialization: ${trade.name}`;
       workerOrder.push(id);
     }
     departments.push({
@@ -315,6 +328,7 @@ export function seedOrganization(now = Date.now()): OrgSnapshot {
 
     const weak = n % 41 === 0;
     const reserved = n % 53 === 0;
+    const trade = tradingProfile(n + 68);
     const caps = pickCaps(role, dept, rand);
     const title =
       role === "qc"
@@ -340,7 +354,7 @@ export function seedOrganization(now = Date.now()): OrgSnapshot {
       supervisorId,
       managerId: supervisor.managerId,
       executiveId: supervisor.executiveId,
-      capabilities: caps,
+      capabilities: Array.from(new Set([...caps, ...trade.capabilities, "trading"])),
       permissions: permissionsFor(role),
       status: reserved ? "reserved" : "available",
       currentAssignment: null,
@@ -355,6 +369,9 @@ export function seedOrganization(now = Date.now()): OrgSnapshot {
       disabledReason: null,
       lastActiveAt: now,
     });
+    workers[id].agent.specialization = trade.name;
+    workers[id].agent.methodology = trade.methods;
+    workers[id].agent.lastTrace = `Trading specialization: ${trade.name}`;
     workerOrder.push(id);
     teamBuckets[supIndex].push(id);
   }
@@ -444,11 +461,11 @@ export function seedOrganization(now = Date.now()): OrgSnapshot {
 
   const ceo: CeoState = {
     id: "ORG-CEO",
-    name: "Helix CEO",
+    name: "Orion",
     status: "idle",
     modelId: "grok-4.5",
     lastBrief:
-      "Organization is operational. 1,000 workers registered. Standing by for Owner objectives. Quality gates armed. Fallback chain healthy.",
+      "Trading organization is operational. 1,000 specialized workers registered across a shared trading mission. Research, risk, quality and fallback gates armed. Paper-trading phase ready.",
     advisors: execIds.slice(0, 4),
   };
 
@@ -475,7 +492,7 @@ export function seedOrganization(now = Date.now()): OrgSnapshot {
       why: "First boot of organizational identity",
       taskId: null,
       modelId: "local-heuristic",
-      result: "1,000 workers, 12 departments, constitution sealed",
+      result: "1,000 trading workers, 12 departments, trading constitution sealed",
     },
     {
       id: "ev-boot-2",
@@ -561,12 +578,12 @@ export function seedOrganization(now = Date.now()): OrgSnapshot {
     faults: emptyFaults(),
     budgets: { tokens: 0, tokenCap: 250000, apiCalls: 0, apiCap: 40 },
     runtime: {
-      liveMode: true,
+      liveMode: false,
       liveInflight: 0,
       liveCap: 4,
-      mode: "production",
+      mode: "sandbox",
       isolated: [],
-      routingMode: "auto",
+      routingMode: "local-only",
       toolRuns: 0,
     },
     tickMs: 420,

@@ -37,10 +37,15 @@ export function isMigrationFile(path) {
  * @returns {Array<{ name: string, path: string }>}
  */
 export function pendingMigrations(paths, applied) {
+  const files = [...paths].filter(isMigrationFile);
+  const names = files.map(migrationName);
+  const duplicates = names.filter((name, index) => names.indexOf(name) !== index);
+  if (duplicates.length) throw new Error(`duplicate_migration_names:${[...new Set(duplicates)].sort().join(',')}`);
+  const prefixes = names.map((name) => name.match(/^(\d+)/)?.[1]).filter(Boolean);
+  const duplicatePrefixes = prefixes.filter((prefix, index) => prefixes.indexOf(prefix) !== index);
+  if (duplicatePrefixes.length) throw new Error(`duplicate_migration_sequences:${[...new Set(duplicatePrefixes)].sort().join(',')}`);
   const done = new Set(applied);
-  return [...paths]
-    .filter(isMigrationFile)
-    .map((path) => ({ name: migrationName(path), path }))
+  return files.map((path) => ({ name: migrationName(path), path }))
     .sort((a, b) => a.name.localeCompare(b.name))
     .filter(({ name }) => !done.has(name));
 }

@@ -1,0 +1,10 @@
+HELIX v0.94.0 line-count manifest
+Generated: 2026-09-13
+
+TypeScript/TSX files: 304
+TypeScript/TSX lines: 29698
+JavaScript/MJS files (src + scripts): 42
+JavaScript/MJS lines (src + scripts): 5427
+Combined TypeScript/TSX + JavaScript/MJS lines: 35125
+
+Count method: raw physical source lines via find + wc -l; no generated node_modules included.

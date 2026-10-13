@@ -1,0 +1,5 @@
+HELIX v0.99.13 fixed count
+source_files=399
+source_lines=40509
+extensions=.ts,.tsx,.mts,.mjs,.js,.jsx
+excluded=node_modules,.git,artifacts,dist,coverage

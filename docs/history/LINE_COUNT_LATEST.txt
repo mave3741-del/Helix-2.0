@@ -1,0 +1,5 @@
+HELIX v0.99.25 JARVIS orchestration baseline
+Source files: 460
+Source lines: 45,294
+Counted extensions: .ts .tsx .mts .mjs .js .jsx
+Excluded: node_modules, dist, build, coverage, generated routeTree.gen.*

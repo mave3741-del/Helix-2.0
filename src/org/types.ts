@@ -103,6 +103,7 @@ export type EventType =
   | "TASK_STARTED"
   | "TASK_COMPLETED"
   | "TASK_FAILED"
+  | "TASK_CANCELLED"
   | "QC_STARTED"
   | "QC_FAILED"
   | "QC_PASSED"
@@ -151,7 +152,15 @@ export type EventType =
   | "SECURITY_ALERT"
   | "SYSTEM_DEGRADED"
   | "ISOLATE"
-  | "LIVE_TURN";
+  | "LIVE_TURN"
+  | "MARKET_TICK"
+  | "FAST_SIGNAL_EMITTED"
+  | "RISK_VETO"
+  | "ORDER_SUBMITTED"
+  | "ORDER_FILLED"
+  | "POSITION_CHANGED"
+  | "DATA_STALE"
+  | "LATENCY_DEGRADED";
 
 export type MemoryLayer =
   | "org"
@@ -548,7 +557,7 @@ export interface RuntimeFlags {
   liveMode: boolean;
   liveInflight: number;
   liveCap: number;
-  mode: "development" | "test" | "staging" | "production";
+  mode: "sandbox" | "development" | "test" | "staging" | "production";
   isolated: { kind: "worker" | "department" | "team" | "tool" | "skill" | "provider" | "task"; id: string }[];
   routingMode: RoutingMode;
   toolRuns: number;

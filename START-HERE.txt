@@ -1,41 +1,45 @@
-HELIX 2.0 — Download and run
-============================
+HELIX Trading Intelligence v0.99.25
 
-What you downloaded
-- Full Helix 2.0 source code
-- Project report (REPORT.md / REPORT.html)
-- Start scripts for Windows, Mac, and Linux
+QUICK START (first time, any OS)
+- Windows: double-click start.bat (browser) or desktop.bat (desktop app)
+- Mac/Linux: run ./start.sh (browser) or ./desktop.sh (desktop app)
+- Either one installs everything needed automatically — nothing to
+  configure by hand first. Under the hood both run "npm run setup" once,
+  which checks your Node version, installs dependencies, and prepares the
+  embedded database.
+- Desktop app is the recommended way to run HELIX day to day — it opens
+  as its own window, not a browser tab.
+- Run these from this folder itself, not from inside a zip or a different
+  extracted copy.
 
-Requirements
-- Node.js 20 or newer  →  https://nodejs.org
+PRIMARY UI
+- Whichever launcher you ran above opens (or prints a link to) the
+  command room — the JARVIS-style control surface.
 
-Windows
-1. Unzip Helix-2.0.zip
-2. Open the helix folder
-3. Double-click start.bat
-4. Wait for npm install, then open  http://localhost:8080
+JARVIS ORCHESTRATION
+- Primary identity: Orion (do not label Orion as CEO in the UI).
+- Named identities: Orion, Lyra, Nova, Atlas, Polaris, Nebula, Titan, Cassini, Astra, Mira, Selene.
+- Voice input dispatches into the orchestration control plane.
+- Browser speech synthesis can speak the latest response.
+- Brain routing supports configurable providers including NVIDIA NIM.
+- Specialist panels can be invoked for research, risk, news/sentiment, portfolio, and debate.
+- Self-improvement is governed: analyze -> sandbox -> test -> audit -> promote.
+- Paper trading remains gated and live execution remains structurally disabled.
 
-Mac / Linux
-1. Unzip Helix-2.0.zip
-2. Open Terminal in the helix folder
-3. chmod +x start.sh
-4. ./start.sh
-5. Open  http://localhost:8080
+BRAIN SETTINGS
+- Open the Brains view from the command-room navigation.
+- Enter provider API keys there; secrets remain server-side, never in a file.
+- NVIDIA NIM uses the NVIDIA NIM/OpenAI-compatible endpoint configured in the Brain provider registry.
 
-Manual
-  npm install
-  npm run dev
+CERTIFICATION (release engineering, not needed for everyday use)
+- CERTIFY_WINDOWS.bat runs the strict Windows certification workflow on a
+  real Windows host with PostgreSQL and network access. See
+  docs/CERTIFICATION_WINDOWS_RUNBOOK.md.
 
-Then open Helix 2.0 in your browser at http://localhost:8080
-
-Urdu / Roman Urdu
-1. Helix-2.0.zip extract karo
-2. Folder ke andar start.bat (Windows) ya start.sh (Mac/Linux) chalao
-3. Browser mein http://localhost:8080 kholo
-
-Live Grok / OpenAI / local LLM calls need keys or endpoints in Brains.
-Without them, Helix 2.0 still runs with the local heuristic kernel.
-
-Report
-- REPORT.md
-- REPORT.html  (open in any browser)
+TROUBLESHOOTING
+- If a launcher fails, re-run it from a terminal (not by double-click) so
+  you can read the error, or run "npm run setup" directly.
+- Older per-OS launchers that duplicated this logic (LAUNCH_BROWSER.bat,
+  RUN_HELIX_SERVER.bat, LAUNCH_HELIX_CERTIFICATION.bat) have been retired
+  in favor of the single setup path above; they're kept for reference
+  under docs/history/legacy-launchers/ only.

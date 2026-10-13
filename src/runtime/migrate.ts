@@ -10,12 +10,12 @@ export function migrateSnapshot(state: OrgSnapshot): OrgSnapshot {
   state.kpis.unknowns ??= 0;
   if (!state.runtime) {
     state.runtime = {
-      liveMode: true,
+      liveMode: false,
       liveInflight: 0,
       liveCap: 4,
-      mode: "production",
+      mode: "sandbox",
       isolated: [],
-      routingMode: "auto",
+      routingMode: "local-only",
       toolRuns: 0,
     };
   }

@@ -1,0 +1,4 @@
+fixed_rule=.ts,.tsx,.mts,.mjs,.js,.jsx
+excluded=node_modules,.git,dist,build,coverage
+source_files=419
+source_lines=42749

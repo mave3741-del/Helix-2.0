@@ -20,6 +20,10 @@ export function MemoryView() {
   const epoch = useOrgStore((s) => s.epoch);
   const memory = useOrgStore((s) => s.memory);
   const [q, setQ] = useState("qc");
+  // `epoch` isn't read directly in the callback, but retrieveMemory() pulls
+  // live state via getState() rather than through its arguments, so `epoch`
+  // is the intended trigger to recompute whenever the store changes.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const hits = useMemo(() => retrieveMemory(useOrgStore.getState(), q || "org", 8), [q, epoch]);
 
   return (

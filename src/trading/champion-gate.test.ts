@@ -1,0 +1,5 @@
+import test from 'node:test'; import assert from 'node:assert/strict';
+import { evaluateChampionEligibility } from './champion-gate.ts';
+const statistical={tradeCount:60,meanReturn:.01,volatility:.01,sharpe:7,tStatistic:7,significantAt95:true,maxDrawdown:.1,robustness:.8,multipleTestingPenalty:.8,adjustedScore:3};
+test('champion gate is fail-closed for stale metrics',()=>{const r=evaluateChampionEligibility({strategyId:'s',evaluationAt:0,maxAgeMs:1000,statistical,parameterSensitivityPassed:true,bootstrapPassed:true,oosPassed:true,walkForwardPassed:true,paperTradeCount:60,currentDrawdown:.05},70000); assert.equal(r.eligible,false); assert.ok(r.reasons.includes('metrics_stale'));});
+test('champion gate accepts fully certified candidate',()=>{const now=Date.now(); const r=evaluateChampionEligibility({strategyId:'s',evaluationAt:now,maxAgeMs:600000,statistical,parameterSensitivityPassed:true,bootstrapPassed:true,oosPassed:true,walkForwardPassed:true,paperTradeCount:60,currentDrawdown:.05},now); assert.equal(r.eligible,true);});

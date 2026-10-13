@@ -1,0 +1,4 @@
+HELIX v0.99.17 source line count
+Rule: .ts, .tsx, .mts, .mjs, .js, .jsx; exclude node_modules, .git, artifacts, dist, coverage
+Files: 407
+Lines: 41255

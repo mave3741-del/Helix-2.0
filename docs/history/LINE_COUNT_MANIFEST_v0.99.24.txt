@@ -1,0 +1,3 @@
+Source measurement rule: .ts .tsx .mts .mjs .js .jsx; dependency/generated trees excluded.
+Total source lines: 43064
+Total source files: 421

@@ -1,0 +1,4 @@
+import {createHash} from 'node:crypto';
+export interface RlAuditBundle { lifecycleHash:string; recoveryHash:string; driftHash:string; stopHash:string|null; bundleHash:string; }
+const stable=(v:unknown):string=>v===null||typeof v!=='object'?JSON.stringify(v):Array.isArray(v)?`[${v.map(stable).join(',')}]`:`{${Object.keys(v as Record<string,unknown>).sort().map(k=>JSON.stringify(k)+':'+stable((v as Record<string,unknown>)[k])).join(',')}}`; const sha=(v:unknown)=>createHash('sha256').update(stable(v)).digest('hex');
+export function buildRlAuditBundle(input:Omit<RlAuditBundle,'bundleHash'>):RlAuditBundle { for(const k of ['lifecycleHash','recoveryHash','driftHash']) if(!/^[a-f0-9]{64}$/i.test(input[k as keyof typeof input] as string)) throw new Error('rl_audit_bundle_hash_invalid'); if(input.stopHash!==null&&!/^[a-f0-9]{64}$/i.test(input.stopHash)) throw new Error('rl_audit_bundle_stop_hash_invalid'); return {...input,bundleHash:sha(input)}; }

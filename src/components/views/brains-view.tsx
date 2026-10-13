@@ -335,7 +335,7 @@ export function BrainsView() {
         <PanelTitle kicker="Budgets" title="Resource management" />
         <p className="font-mono text-sm tabular-nums">
           {formatCompact(budgets.tokens)} / {formatCompact(budgets.tokenCap)} tokens · {budgets.apiCalls} /{" "}
-          {budgets.apiCap} CEO API calls
+          {budgets.apiCap} Orion API calls
         </p>
         <div className="mt-3 h-1 rounded-full bg-card-elevated">
           <div

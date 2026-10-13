@@ -1,0 +1,11 @@
+HELIX Trading Intelligence v0.99.25
+
+BROWSER START:
+Double-click: LAUNCH_BROWSER.bat
+
+The launcher uses the project-local Node 22.22.1 / npm 10 runtime.
+It never relies on the system Node version.
+It installs dependencies with the local npm when needed, starts the Vite server,
+waits until http://127.0.0.1:8080 actually responds, and only then opens Chrome/Edge.
+
+If startup fails, read: .helix-browser.log

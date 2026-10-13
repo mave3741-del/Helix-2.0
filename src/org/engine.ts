@@ -9,10 +9,8 @@ import type {
   Approval,
   AuditEntry,
   Brain,
-  ClaimKind,
   EventType,
   Improvement,
-  Kpis,
   MemoryItem,
   OrgEvent,
   OrgMessage,
@@ -188,7 +186,10 @@ function hasSkillGap(state: OrgSnapshot, cap: string): boolean {
 }
 
 export interface PlanInput {
-  text: string;
+  // Not read by applyPlan/reconcilePlan (they derive text from the
+  // objective itself), but kept optional so callers that only have a
+  // strategy/task breakdown on hand aren't forced to fabricate one.
+  text?: string;
   strategy?: string;
   departments?: string[];
   tasks?: { title: string; department: string; capability: string; risk?: RiskLevel }[];
@@ -219,7 +220,7 @@ export function applyPlan(state: OrgSnapshot, objectiveId: string, plan: PlanInp
     createdAt: Date.now(),
   };
   state.projects.unshift(project);
-  emit(state, "PROJECT_CREATED", "ORG-CEO", project.name, "CEO strategy accepted", {
+  emit(state, "PROJECT_CREATED", "ORG-CEO", project.name, "Orion strategy accepted", {
     result: deptIds.join(","),
   });
 
@@ -291,7 +292,7 @@ export function applyPlan(state: OrgSnapshot, objectiveId: string, plan: PlanInp
     created.push(task);
     state.tasks[task.id] = task;
     state.taskOrder.unshift(task.id);
-    emit(state, "TASK_CREATED", "ORG-CEO", task.title, "Decomposed from CEO strategy", {
+    emit(state, "TASK_CREATED", "ORG-CEO", task.title, "Decomposed from Orion strategy", {
       taskId: task.id,
       modelId: brain.id,
     });
@@ -316,6 +317,76 @@ export function applyPlan(state: OrgSnapshot, objectiveId: string, plan: PlanInp
   }
 
   message(state, "ORG-CEO", deptIds[0] ?? "strategy", "request", obj.strategy, created[0]?.id ?? null);
+}
+
+export function reconcilePlan(state: OrgSnapshot, objectiveId: string, plan: PlanInput) {
+  const obj = state.objectives.find((o) => o.id === objectiveId);
+  if (!obj) return;
+  const existing = state.projects.find((project) => project.objectiveId === objectiveId);
+  if (!existing) {
+    applyPlan(state, objectiveId, plan);
+    return;
+  }
+  const risk = plan.risk ?? obj.risk;
+  const cap = neededCapability(obj.text);
+  const deptIds = plan.departments?.length ? plan.departments : existing.departmentIds;
+  obj.strategy = plan.strategy ?? obj.strategy ?? localStrategy(obj.text, deptIds);
+  obj.risk = risk;
+  obj.status = risk === "high" || risk === "critical" ? "awaiting_approval" : "active";
+  existing.departmentIds = [...deptIds];
+  existing.summary = obj.strategy.slice(0, 220);
+  existing.risk = risk;
+  existing.status = obj.status === "awaiting_approval" ? "awaiting_approval" : "active";
+  state.ceo.status = "directing";
+  state.ceo.lastBrief = obj.strategy;
+
+  const desired = plan.tasks?.length ? plan.tasks : deptIds.map((d) => ({
+    title: `${state.departments.find((x) => x.id === d)?.name ?? d}: ${obj.text.slice(0, 48)}`,
+    department: d,
+    capability: capForDept(d, cap),
+    risk,
+  }));
+  const existingTasks = Object.values(state.tasks).filter((task) => task.projectId === existing.id);
+  const desiredSignatures = new Set(desired.map((spec) => `${spec.department}|${spec.capability}|${spec.title}`));
+  for (const task of existingTasks) {
+    const signature = `${task.departmentId}|${task.requiredCapability}|${task.title}`;
+    if (!desiredSignatures.has(signature) && ["queued", "awaiting_approval", "planning"].includes(task.status)) {
+      task.status = "cancelled";
+      task.updatedAt = Date.now();
+      emit(state, "TASK_CANCELLED", "ORG-CEO", task.title, "Removed by authoritative CEO reconciliation", { taskId: task.id, result: existing.id });
+    }
+  }
+  const activeBySignature = new Set(Object.values(state.tasks).filter((task) => task.projectId === existing.id && !["done", "failed", "cancelled"].includes(task.status)).map((task) => `${task.departmentId}|${task.requiredCapability}|${task.title}`));
+  let added = 0;
+  for (const spec of desired) {
+    const signature = `${spec.department}|${spec.capability}|${spec.title}`;
+    if (activeBySignature.has(signature)) continue;
+    const dept = state.departments.find((d) => d.id === spec.department);
+    if (!dept) continue;
+    const brain = selectBrain(state, spec.capability, 0.8);
+    const skill = skillForCap(state, spec.capability);
+    const task: Task = {
+      id: nid("tsk"), projectId: existing.id, objectiveId: obj.id, title: spec.title,
+      description: contextPacket(obj.text, spec.title, spec.capability, skill?.id ?? null),
+      departmentId: spec.department, supervisorId: dept.supervisorIds[0] ?? "ORG-CEO", workerId: null, qcId: null, testerId: null,
+      owner: "supervisor", status: risk === "high" || risk === "critical" ? "awaiting_approval" : "queued",
+      priority: obj.priority, urgency: 3, importance: 4, risk: spec.risk ?? risk, skillId: skill?.id ?? null, requiredCapability: spec.capability, brainId: brain.id,
+      fallbacks: capabilityChain(spec.capability).filter((id) => id !== brain.id), dependencies: [], progress: 0, plan: `Execute ${spec.capability} under ${dept.name} with independent QC.`, output: "", evidence: [], failures: [], corrections: 0,
+      tests: [{ name: "unit", result: "pending" }, { name: "requirement", result: "pending" }, { name: "edge-case", result: "pending" }], qcVerdict: null, qcNotes: "", approval: risk === "high" || risk === "critical" ? "pending" : "not_required", lessons: [], locked: false, createdAt: Date.now(), updatedAt: Date.now(), deadline: Date.now() + 1000 * 60 * 20, tokenUsed: 0, gate: 0, claim: "unverified_claim", ...taskRuntimeFields(state, obj.priority),
+    };
+    state.tasks[task.id] = task; state.taskOrder.unshift(task.id); added += 1;
+    emit(state, "TASK_CREATED", "ORG-CEO", task.title, "Reconciled from authoritative Orion plan", { taskId: task.id, modelId: brain.id });
+  }
+  const activeTasks = desired.map((spec) => Object.values(state.tasks)
+    .filter((task) => task.projectId === existing.id && task.title === spec.title && task.requiredCapability === spec.capability && task.departmentId === spec.department && !['done','failed','cancelled'].includes(task.status))
+    .sort((a,b) => b.updatedAt - a.updatedAt)[0])
+    .filter(Boolean) as Task[];
+  for (let i = 0; i < activeTasks.length; i += 1) {
+    activeTasks[i].dependencies = i === 0 ? [] : [activeTasks[i - 1].id];
+    activeTasks[i].updatedAt = Date.now();
+  }
+  if (plan.skillGaps?.length) for (const gap of plan.skillGaps) startSkillFactory(state, gap, existing.id, obj.id);
+  emit(state, "STRATEGY_SET", "ORG-CEO", obj.text, `Authoritative Orion plan reconciled (${added} task(s) added, stale tasks cancelled)`, { result: existing.id });
 }
 
 function capForDept(dept: string, fallback: string): string {
@@ -462,7 +533,7 @@ export function issueObjective(state: OrgSnapshot, text: string, priority = 3): 
   state.ceo.status = "planning";
   emit(state, "OBJECTIVE_ISSUED", "OWNER", text, "Owner direction", { result: obj.id });
   applyPlan(state, obj.id, { text, risk });
-  emit(state, "STRATEGY_SET", "ORG-CEO", obj.strategy.slice(0, 120), "CEO planning complete");
+  emit(state, "STRATEGY_SET", "ORG-CEO", obj.strategy.slice(0, 120), "Orion planning complete");
   return obj.id;
 }
 
@@ -1269,7 +1340,10 @@ export function setLiveMode(state: OrgSnapshot, on: boolean) {
 export function setRoutingMode(state: OrgSnapshot, mode: OrgSnapshot["runtime"]["routingMode"]) {
   if (!state.runtime) return;
   state.runtime.routingMode = mode;
-  state.runtime.liveMode = mode !== "local-only";
+  // Routing is a brain/provider concern. It must never implicitly enable
+  // live trading; live execution stays structurally disabled until a
+  // separately governed release changes that invariant.
+  state.runtime.liveMode = false;
 }
 
 export const GATE_LABELS = QUALITY_GATES;

@@ -1,0 +1,6 @@
+HELIX v0.99.9 fixed source count
+Rule: count non-empty/non-comment-neutral source lines? Actual implementation count uses all text lines in .ts/.tsx/.mts/.cts/.mjs/.cjs/.js/.jsx files, excluding node_modules/.git/build/dist/coverage.
+Code files: 391
+Code lines: 39791
+TypeScript-family and JS/MJS-family are included in the combined total.
+Live execution: DISABLED

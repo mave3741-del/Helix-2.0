@@ -6,9 +6,9 @@ import { fileURLToPath } from "node:url";
 import test from "node:test";
 import {
   appNameFromHost,
-  createHeadInjector,
+  createHeadInjector as rawCreateHeadInjector,
   grokXCreatorHeadTags,
-  injectGrokPwaHead,
+  injectGrokPwaHead as rawInjectGrokPwaHead,
   isDocumentPath,
   isInstallQuery,
   publicAppHost,
@@ -20,6 +20,13 @@ import {
 import { renderInstallPage } from "./grok-pwa-plugin.mjs";
 
 const TEMPLATE_ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
+
+// These tests validate generic platform behavior. Keep them isolated from the
+// repository's real Helix identity/site.json and public/og.jpg.
+const TEST_CWD = mkdtempSync(join(tmpdir(), "grok-pwa-test-root-"));
+const injectGrokPwaHead = (html, ctx = {}) =>
+  rawInjectGrokPwaHead(html, { cwd: TEST_CWD, ...ctx });
+const createHeadInjector = (ctx = {}) => rawCreateHeadInjector({ cwd: TEST_CWD, ...ctx });
 
 test("injects before </head>", () => {
   const out = injectGrokPwaHead("<html><head><title>x</title></head><body></body></html>");

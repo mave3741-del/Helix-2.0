@@ -1,0 +1,5 @@
+HELIX v0.98.5
+TS/TSX/MJS source lines: 31,684
+Source files: 319
+Test files: 107
+Phase: 8.6 — Worker Activation & Executable Event Loop

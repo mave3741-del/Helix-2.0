@@ -111,7 +111,14 @@ function main(argv) {
     process.exit(2);
   }
   const env = mergeAppEnv(readAppEnv(projectRoot()), process.env);
-  const child = spawn(command, args, { stdio: "inherit", env });
+  // On Windows, a locally-installed CLI like "vite" resolves through
+  // node_modules/.bin to a .cmd shim, not a directly executable file —
+  // spawn() without `shell: true` fails there with ENOENT even though the
+  // same command works fine typed into a terminal (the same class of bug
+  // as the classic "spawn npm ENOENT" issue). `command`/`args` here always
+  // come from this project's own package.json scripts, never user input,
+  // so shelling out on Windows carries no injection risk.
+  const child = spawn(command, args, { stdio: "inherit", env, shell: process.platform === "win32" });
   // The dev server is long-running and is stopped by signalling this wrapper.
   for (const signal of ["SIGINT", "SIGTERM", "SIGHUP"]) {
     process.on(signal, () => child.kill(signal));

@@ -1,0 +1,6 @@
+HELIX v0.99.3
+Code source extensions counted: .ts .tsx .mts .mjs .js .jsx
+Source files: 381
+Source lines: 38961
+TypeScript-only (.ts): 30234
+Counting excludes node_modules and generated renderer output.

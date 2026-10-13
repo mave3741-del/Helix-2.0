@@ -58,7 +58,7 @@ test("non-.sql entries are dropped (readdir also yields the auth/ directory)", (
 
 test("the auth schema ships outside the globbed directory", () => {
   const migrationsDir = join(projectRoot(), "migrations");
-  assert.deepEqual(pendingMigrations(readdirSync(migrationsDir), []), []);
+  assert.ok(!pendingMigrations(readdirSync(migrationsDir), []).some(({ name }) => name === "auth"));
   assert.ok(readdirSync(join(migrationsDir, "auth")).includes("0001_auth.sql"));
 });
 
@@ -87,4 +87,11 @@ test("the copy check reads both files and catches an edit", () => {
   writeFileSync(join(root, "migrations", AUTH_MIGRATION), "create table t (x int);\n");
   const drifted = authSchemaCopy(root);
   assert.notEqual(drifted.copy, drifted.source);
+});
+
+test("duplicate migration sequence numbers are rejected", () => {
+  assert.throws(
+    () => pendingMigrations(["0010_a.sql", "0010_b.sql"], []),
+    /duplicate_migration_sequences:0010/,
+  );
 });

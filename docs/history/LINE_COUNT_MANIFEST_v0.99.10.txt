@@ -1,0 +1,9 @@
+HELIX v0.99.10
+Fixed line-count rule: .ts + .tsx + .mts + .mjs + .js + .jsx; excluding node_modules.
+Source lines: 39989
+Source files: 393
+Phase 9.6 focused tests: 24/24 PASS
+Coverage integrity: 113/113
+Migration integrity: 34/34
+Release integrity: PASS
+Live trading: DISABLED

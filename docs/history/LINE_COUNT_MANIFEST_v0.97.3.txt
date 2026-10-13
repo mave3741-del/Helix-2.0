@@ -1,0 +1,4 @@
+HELIX v0.97.3 source line measurement
+TypeScript/TSX: 31,365 lines across 315 files
+JavaScript/JSX/MJS/CJS: 5,511 lines across 44 files
+Combined counted source: 36,876 lines across 359 files

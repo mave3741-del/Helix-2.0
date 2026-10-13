@@ -1,0 +1,28 @@
+{
+  "schema": 2,
+  "gate": "phase8.1-external-certification",
+  "packageVersion": "0.98.3",
+  "generatedAt": "2026-09-14T00:00:00.000Z",
+  "environment": {
+    "node": "v22.16.0",
+    "platform": "linux",
+    "reviewerPresent": true,
+    "implementerPresent": true,
+    "reviewerDiffers": true,
+    "liveExecution": false
+  },
+  "prerequisites": {
+    "status": "READY",
+    "reasons": []
+  },
+  "execution": [
+    {
+      "name": "release:integrity",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "ok"
+    }
+  ],
+  "status": "PASS",
+  "evidenceHash": "1c8e09de7000fd046db1ae41e2cc1208f2be8d4cab2364c0696691ab2290d4d9"
+}

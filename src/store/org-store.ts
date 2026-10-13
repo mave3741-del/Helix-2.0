@@ -7,6 +7,7 @@ import {
   grantApproval,
   isolate,
   issueObjective,
+  reconcilePlan,
   setBrainAvailable,
   setLiveMode,
   setOrgStatus,
@@ -53,6 +54,7 @@ type OrgStore = OrgSnapshot & {
       strategy: string;
       departments: string[];
       skillGaps: string[];
+      tasks?: { title: string; department: string; capability: string; risk?: "low" | "medium" | "high" | "critical" }[];
       risk: "low" | "medium" | "high" | "critical";
     },
   ) => void;
@@ -123,12 +125,7 @@ export const useOrgStore = create<OrgStore>()(
       },
       applyCeoPlan: (objectiveId, plan) =>
         set((s) => {
-          const obj = s.objectives.find((o) => o.id === objectiveId);
-          if (obj) {
-            obj.strategy = plan.strategy;
-            obj.risk = plan.risk;
-            s.ceo.lastBrief = plan.strategy;
-          }
+          reconcilePlan(s, objectiveId, plan);
           return { epoch: s.epoch + 1 };
         }),
       setPlanning: (planning, planError = null) => set({ planning, planError }),
@@ -198,9 +195,10 @@ export const useOrgStore = create<OrgStore>()(
         set((s) => ({ identity: { ...s.identity, mission }, epoch: s.epoch + 1 })),
       setOwnerName: (ownerName) =>
         set((s) => ({ identity: { ...s.identity, ownerName }, epoch: s.epoch + 1 })),
-      setLive: (on) =>
+      setLive: (_on) =>
         set((s) => {
-          setLiveMode(s, on);
+          // Current HELIX release keeps live execution structurally disabled.
+          setLiveMode(s, false);
           return { runtime: { ...s.runtime }, epoch: s.epoch + 1 };
         }),
       setRouting: (mode) =>
@@ -309,6 +307,8 @@ export const useOrgStore = create<OrgStore>()(
         } else {
           migrateSnapshot(state);
         }
+        // Never rehydrate an old snapshot into live execution.
+        if (state.runtime) state.runtime.liveMode = false;
         state.hydrated = true;
       },
     },

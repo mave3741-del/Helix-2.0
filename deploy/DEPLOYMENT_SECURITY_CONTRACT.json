@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 1,
+  "workerIsolation": {
+    "required": true,
+    "recommendedRuntime": "rootless-container-or-vm",
+    "readOnlyRootFilesystem": true,
+    "noNewPrivileges": true,
+    "dropAllCapabilities": true
+  },
+  "networkEgress": {
+    "required": true,
+    "default": "deny",
+    "allowlistOnly": true,
+    "redirects": "deny",
+    "privateAddresses": "deny"
+  },
+  "secretsIsolation": {
+    "required": true,
+    "workerAccess": "deny",
+    "liveCredentials": "deny"
+  },
+  "liveExecution": {
+    "default": "disabled",
+    "canEnableOnlyAfterIndependentReadinessGates": true
+  },
+  "attestation": {
+    "algorithm": "Ed25519",
+    "privateKeyLocation": "deployment-orchestrator-only",
+    "publicKeyEnvironmentVariable": "HELIX_DEPLOYMENT_ATTESTATION_PUBLIC_KEY",
+    "tokenEnvironmentVariable": "HELIX_DEPLOYMENT_ATTESTATION"
+  },
+  "phase5_22_strictSandbox": {
+    "required": true,
+    "attestationEnvironment": {
+      "HELIX_DEPLOYMENT_SANDBOX": "container",
+      "HELIX_NETWORK_POLICY": [
+        "deny",
+        "allowlist"
+      ],
+      "HELIX_FILESYSTEM_POLICY": "isolated",
+      "HELIX_RAW_KEYS_DENIED": "true",
+      "HELIX_PRIVILEGE_RESTRICTED": "true"
+    },
+    "failClosed": true,
+    "liveExecutionRemainsDisabled": true
+  }
+}

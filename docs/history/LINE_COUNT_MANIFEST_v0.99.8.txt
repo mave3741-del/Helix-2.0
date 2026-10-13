@@ -1,0 +1,10 @@
+HELIX v0.99.8 fixed source-code line count
+Rule: count all non-hidden, non-node_modules files with extensions .ts,.tsx,.mts,.mjs,.js,.jsx under the release root.
+Files: 389
+.ts: 30289
+.tsx: 2554
+.mts: 80
+.mjs: 6649
+.js: 0
+.jsx: 0
+TOTAL: 39572

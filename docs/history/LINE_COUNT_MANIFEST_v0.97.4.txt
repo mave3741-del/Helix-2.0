@@ -1,0 +1,4 @@
+HELIX Trading Intelligence v0.97.4 line count manifest
+TypeScript/TSX: 31533 lines across 317 files
+JavaScript/JSX/MJS/CJS: 5511 lines across 44 files
+Combined counted source: 37044 lines across 361 files

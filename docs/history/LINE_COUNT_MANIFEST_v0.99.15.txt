@@ -1,0 +1,4 @@
+HELIX v0.99.15
+Rule: .ts,.tsx,.mts,.mjs,.js,.jsx; excluding node_modules,.git,artifacts,dist,coverage
+Source files: 403
+Source lines: 40798

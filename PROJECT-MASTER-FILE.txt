@@ -1,0 +1,52 @@
+HELIX PROJECT MASTER FILE — CURRENT HANDOFF
+
+Canonical current baseline: HELIX Trading Intelligence v0.99.25 / Master v1.94
+Current hardening update: v0.99.25 → full-project deep-audit risk/accounting/release-hardening slice
+
+AUTHORITATIVE CURRENT STATE
+- Phase 1 through Phase 10.8 engineering work is retained.
+- Phase 10.8 RL research capability is engineering-complete.
+- Live execution remains DISABLED.
+- Phase 10.5 deferred hardening has now been implemented for governed external-source admission, adapter/endpoint binding, and append-only evidence-hash persistence.
+- Migration 0044 adds append-only protection and a unique evidence-hash constraint for external intelligence.
+- New registry path: src/trading/data/external-intelligence-registry.ts and src/trading/data/external-intelligence-store.ts.
+- Governed adapters now bind to explicit source manifests and admitted official endpoints for SEC EDGAR and FRED/ALFRED.
+
+VERIFICATION OF THIS HARDENING SLICE
+- External-intelligence + registry + source-specific + RL regression: 22/22 PASS.
+- Test coverage integrity: 123/123 PASS.
+- Migration integrity: 43/43 numbered migrations hashed successfully.
+- Dependency integrity: BLOCKED because the extracted workspace has 0/71 direct dependencies installed; this is an environment gate, not a claim of test failure.
+- Therefore typecheck/lint/build/full dependency-backed E2E remain NOT CERTIFIED in this workspace.
+
+DOCUMENTATION / RELEASE HYGIENE
+- Historical certification, audit, and line-count artifacts are under docs/history/ and are not authoritative current state.
+- This root handoff is the current source-package handoff; future updates must change the current version explicitly.
+- Current certification gate must never be interpreted as production/live-trading certification.
+\SAFETY
+- No change enables live execution.
+- External intelligence remains evidence-only and tradeDirectiveAllowed=false.
+- RL remains research/paper-only.
+- Unknown external sources and unregistered adapters fail closed.
+
+LATEST RL BATCH: Phase 10.8.11–10.8.14
+- 10.8.11 lifecycle persistence/recovery
+- 10.8.12 champion drift monitoring
+- 10.8.13 RL emergency stop
+- 10.8.14 unified audit bundle
+Verification: 6/6 focused tests PASS; 52/52 migrations PASS. Live execution remains disabled.
+
+LATEST REMEDIATION — v0.99.25
+- Unified npm test command now loads TypeScript stripping and alias loader for the entire test run.
+- Added required public/__grok/icon-180.png asset.
+- Removed stray master_contacts screenshots from the release working copy.
+- Full dependency-backed typecheck/lint/CI certification remains blocked until all direct dependencies are installed.
+- A 53-test targeted regression covering the alias-loader/capability-router and Grok PWA asset path passed 53/53.
+
+
+FULL-PROJECT DEEP AUDIT — v0.99.25
+- Fresh audit baseline: 452 source files / 44328 source lines under the canonical extension rule, excluding dependency/build/generated route-tree files.
+- Confirmed and fixed: limit-order risk-budget enforcement gap; opening-short strategy-cap bypass; cross-symbol leverage/exposure valuation using stale average entry prices; daily realized-PnL reset semantics; post-trade strategy attribution on closes/flips.
+- Targeted regression coverage added for each corrected risk/accounting path.
+- Dependency-backed typecheck/lint/build remain NOT CERTIFIED in this extracted workspace because direct dependencies are not installed.
+- Live execution remains DISABLED.

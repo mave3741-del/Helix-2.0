@@ -1,0 +1,10 @@
+HELIX Trading Intelligence — Fixed Line Count Manifest v0.99.11
+Rule: count lines in source files with extensions .ts, .tsx, .mts, .mjs, .js, .jsx; exclude node_modules and generated render artifacts.
+Total source files: 395
+Total source lines: 40,235
+.ts: 30,952 lines / 297 files
+.tsx: 2,554 lines / 37 files
+.mts: 80 lines / 1 file
+.mjs: 6,649 lines / 60 files
+.js: 0 lines / 0 files
+.jsx: 0 lines / 0 files

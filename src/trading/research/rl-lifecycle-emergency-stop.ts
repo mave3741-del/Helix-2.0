@@ -1,0 +1,5 @@
+import {createHash} from 'node:crypto';
+export interface RlEmergencyStop { active:boolean; reason:string; source:'operator'|'governance'|'integrity'; activatedAt:number; evidenceHash:string; }
+const stable=(v:unknown):string=>v===null||typeof v!=='object'?JSON.stringify(v):Array.isArray(v)?`[${v.map(stable).join(',')}]`:`{${Object.keys(v as Record<string,unknown>).sort().map(k=>JSON.stringify(k)+':'+stable((v as Record<string,unknown>)[k])).join(',')}}`; const sha=(v:unknown)=>createHash('sha256').update(stable(v)).digest('hex');
+export function activateRlEmergencyStop(reason:string,source:RlEmergencyStop['source'],activatedAt:number):RlEmergencyStop { if(!reason.trim()) throw new Error('rl_emergency_stop_reason_required'); if(!Number.isFinite(activatedAt)) throw new Error('rl_emergency_stop_time_invalid'); const base={active:true,reason,source,activatedAt}; return {...base,evidenceHash:sha(base)}; }
+export function requireRlNotStopped(stop:RlEmergencyStop|null):void { if(stop?.active) throw new Error('rl_emergency_stop_active'); }

@@ -87,7 +87,7 @@ export const BRAIN_SEED: Brain[] = [
     failRate: 0.02,
     tokensUsed: 0,
     tasks: 0,
-    specialty: "Complex reasoning and CEO strategy",
+    specialty: "Complex reasoning and Orion strategy",
     costClass: "paid",
     privacy: "any",
     fallbackRank: 1,

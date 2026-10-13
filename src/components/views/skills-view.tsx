@@ -1,6 +1,6 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Panel, PanelTitle } from "@/components/ui/panel";
+import { Panel } from "@/components/ui/panel";
 import { formatPct } from "@/lib/utils";
 import { useOrgStore } from "@/store/org-store";
 

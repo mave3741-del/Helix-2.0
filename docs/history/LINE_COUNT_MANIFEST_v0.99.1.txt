@@ -1,0 +1,9 @@
+HELIX Trading Intelligence v0.99.1
+Source Line Count Manifest
+Generated: 2026-09-14
+
+TypeScript/TSX: 32,402 lines
+JavaScript/JSX/MJS/CJS: 6,093 lines
+Combined counted source: 38,495 lines across 378 files
+
+Counting scope: source files under the project tree, excluding node_modules, .git, and .helix.

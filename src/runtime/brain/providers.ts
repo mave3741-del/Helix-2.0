@@ -1,5 +1,3 @@
-import type { BrainProvider } from "@/org/types";
-
 export type RoutingMode = "auto" | "local-only" | "hybrid" | "cloud-first";
 
 export type ProviderKind = "cloud" | "local" | "gateway" | "heuristic";
@@ -21,6 +19,18 @@ export interface ProviderDef {
 }
 
 export const PROVIDER_DEFS: ProviderDef[] = [
+  {
+    id: "nvidia-nim",
+    name: "NVIDIA NIM",
+    kind: "cloud",
+    defaultBase: "https://integrate.api.nvidia.com/v1",
+    defaultModel: "nvidia/llama-3.3-nemotron-super-49b-v1.5",
+    envKey: "NVIDIA_API_KEY",
+    envModel: "NVIDIA_NIM_MODEL",
+    needsKey: true,
+    capabilities: ["reasoning", "planning", "coding", "research", "qc", "tools", "agentic"],
+    notes: "NVIDIA hosted NIM OpenAI-compatible endpoint. Model is configurable."
+  },
   {
     id: "xai",
     name: "xAI",
@@ -199,9 +209,76 @@ export const PROVIDER_DEFS: ProviderDef[] = [
     capabilities: ["ops", "routing", "classification", "qc"],
     notes: "Always-on deterministic kernel. Not an LLM.",
   },
+  {
+    id: "elevenlabs",
+    name: "ElevenLabs (voice)",
+    kind: "cloud",
+    defaultBase: "https://api.elevenlabs.io/v1",
+    defaultModel: "eleven_flash_v2_5",
+    envKey: "ELEVENLABS_API_KEY",
+    needsKey: true,
+    capabilities: ["voice"],
+    notes: "Realistic per-agent text-to-speech for Orion's council. Free tier ~10k credits/month. Falls back to the browser's built-in voice when not configured.",
+  },
+  {
+    id: "resend",
+    name: "Resend (email)",
+    kind: "cloud",
+    defaultBase: "https://api.resend.com",
+    defaultModel: "",
+    envKey: "RESEND_API_KEY",
+    needsKey: true,
+    capabilities: ["email"],
+    notes: "Powers the email.send tool. Free tier ~3k emails/month, 100/day. Every send still needs your owner approval — this key doesn't bypass that.",
+  },
+  {
+    id: "reddit",
+    name: "Reddit (sentiment)",
+    kind: "cloud",
+    defaultBase: "https://oauth.reddit.com",
+    defaultModel: "",
+    envKey: "REDDIT_CLIENT_ID",
+    needsKey: true,
+    capabilities: ["sentiment"],
+    notes: "Free tier (100 req/min, personal use). Register a 'script' app at reddit.com/prefs/apps, then paste ClientID:ClientSecret here. Also needs REDDIT_CLIENT_SECRET as an env var.",
+  },
+  {
+    id: "x-twitter",
+    name: "X / Twitter (sentiment)",
+    kind: "cloud",
+    defaultBase: "https://api.x.com/2",
+    defaultModel: "",
+    envKey: "X_BEARER_TOKEN",
+    needsKey: true,
+    capabilities: ["sentiment"],
+    notes: "X closed its free read tier in Feb 2026 — this is pay-per-use (~$0.005/read) on X's side. Optional; everything else works without it.",
+  },
+  {
+    id: "binance",
+    name: "Binance (market data)",
+    kind: "cloud",
+    defaultBase: "https://api.binance.com",
+    defaultModel: "",
+    envKey: "BINANCE_API_KEY",
+    needsKey: false,
+    capabilities: ["market-data"],
+    notes: "Public price/OHLCV data via CCXT needs no key at all. Only add a key here if you later want authenticated endpoints (e.g. your own account balances) — trading itself stays paper-only regardless.",
+  },
+  {
+    id: "fred",
+    name: "FRED (macro data)",
+    kind: "cloud",
+    defaultBase: "https://api.stlouisfed.org/fred",
+    defaultModel: "",
+    envKey: "FRED_API_KEY",
+    needsKey: true,
+    capabilities: ["market-data", "macro"],
+    notes: "Free, instant signup at fredaccount.stlouisfed.org — rates, CPI, GDP, unemployment, and thousands of other series.",
+  },
 ];
 
 export const BRAIN_TO_PROVIDER: Record<string, string> = {
+  "nvidia-nim": "nvidia-nim",
   "grok-4.5": "xai",
   "grok-fast": "xai",
   "open-reasoner": "openrouter",
@@ -248,19 +325,19 @@ export function isLocalProvider(id: string) {
 
 export function capabilityChain(required: string): string[] {
   if (required === "coding") {
-    return ["cloud-coder", "deepseek", "grok-4.5", "openai-gpt", "ollama", "local-heuristic"];
+    return ["cloud-coder", "nvidia-nim", "deepseek", "grok-4.5", "openai-gpt", "ollama", "local-heuristic"];
   }
   if (required === "research") {
-    return ["grok-4.5", "perplexity", "open-reasoner", "google-gemini", "local-heuristic"];
+    return ["grok-4.5", "nvidia-nim", "perplexity", "open-reasoner", "google-gemini", "local-heuristic"];
   }
   if (required === "planning") {
-    return ["grok-4.5", "omniroute", "grok-fast", "local-heuristic"];
+    return ["grok-4.5", "nvidia-nim", "omniroute", "grok-fast", "local-heuristic"];
   }
   if (required === "qc") {
-    return ["anthropic-claude", "grok-fast", "open-reasoner", "local-heuristic"];
+    return ["anthropic-claude", "nvidia-nim", "grok-fast", "open-reasoner", "local-heuristic"];
   }
   if (required === "writing") {
-    return ["grok-fast", "openai-gpt", "mistral", "ollama", "local-heuristic"];
+    return ["grok-fast", "nvidia-nim", "openai-gpt", "mistral", "ollama", "local-heuristic"];
   }
   return ["grok-fast", "open-reasoner", "ollama", "local-heuristic", "grok-4.5"];
 }

@@ -1,0 +1,26 @@
+{
+  "schema": 1,
+  "gate": "phase9-external-certification-sealed-bundle",
+  "packageVersion": "0.99.6",
+  "certificationStatus": "PASS",
+  "preflightStatus": "READY",
+  "evidenceHash": "280b3ad87b8d00b6467c134ba0eb6ca2cb01537747af9c0a48326577d24f772c",
+  "files": [
+    {
+      "path": "external-certification-evidence.json",
+      "bytes": 501,
+      "sha256": "983068723c7179bc2c27814d278a405f1286e6b4751853402d6a900bbce395aa"
+    }
+  ],
+  "safety": {
+    "liveExecutionDisabled": true,
+    "credentialsSerialized": false,
+    "reviewerIdentitySerialized": false,
+    "databaseConnectionStringSerialized": false
+  },
+  "lockfile": {
+    "lockfileVersion": 3,
+    "rootVersion": "0.99.6"
+  },
+  "bundleHash": "988aeda5cc0b0c0968fbeadb32ab38088e2537305c6c0985e25ae258c5830f14"
+}

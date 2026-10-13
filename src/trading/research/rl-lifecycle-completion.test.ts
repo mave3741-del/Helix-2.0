@@ -1,0 +1,9 @@
+import test from 'node:test'; import assert from 'node:assert/strict';
+import { buildSnapshot } from './rl-lifecycle-recovery.ts'; import { evaluateRlCompletion } from './rl-lifecycle-completion.ts';
+const h='a'.repeat(64); const drift={championId:'c',baselineHash:h,currentHash:'b'.repeat(64),baselineReturn:1,currentReturn:.95,maxDegradationRate:.2,now:100};
+const snaps=[buildSnapshot({sequence:1,state:'retain',championId:'c',challengerId:null,previousHash:null,createdAt:1})];
+test('recovers and retains healthy champion',()=>{const r=evaluateRlCompletion({snapshots:snaps,drift,candidateId:null,evidenceFresh:true,evidenceComplete:true,emergencyStop:false,approvalRequired:false,approvalGranted:false});assert.equal(r.decision,'retain');assert.equal(r.recoveredSequence,1);});
+test('promotes approved candidate',()=>{const r=evaluateRlCompletion({snapshots:snaps,drift,candidateId:'x',evidenceFresh:true,evidenceComplete:true,emergencyStop:false,approvalRequired:true,approvalGranted:true});assert.equal(r.decision,'promote');});
+test('holds stale evidence',()=>{const r=evaluateRlCompletion({snapshots:snaps,drift,candidateId:'x',evidenceFresh:false,evidenceComplete:true,emergencyStop:false,approvalRequired:false,approvalGranted:false});assert.equal(r.decision,'hold');});
+test('rolls back on drift',()=>{const r=evaluateRlCompletion({snapshots:snaps,drift:{...drift,currentReturn:.5},candidateId:null,evidenceFresh:true,evidenceComplete:true,emergencyStop:false,approvalRequired:false,approvalGranted:false});assert.equal(r.decision,'rollback');});
+test('emergency stop dominates',()=>{const r=evaluateRlCompletion({snapshots:snaps,drift,candidateId:'x',evidenceFresh:true,evidenceComplete:true,emergencyStop:true,approvalRequired:false,approvalGranted:false});assert.equal(r.decision,'stop');});

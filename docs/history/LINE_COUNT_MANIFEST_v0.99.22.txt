@@ -1,0 +1,4 @@
+HELIX source line-count manifest v0.99.22
+Rule: .ts,.tsx,.mts,.mjs,.js,.jsx across project; exclude dependency/generated trees.
+Source files: 417
+Source lines: 42518

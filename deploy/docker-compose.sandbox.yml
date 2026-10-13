@@ -1,0 +1,22 @@
+services:
+  helix-worker:
+    build:
+      context: ..
+      dockerfile: deploy/worker.Dockerfile
+    read_only: true
+    user: "10001:10001"
+    init: true
+    network_mode: "none"
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    pids_limit: 128
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,size=64m
+    environment:
+      HELIX_DEPLOYMENT_SANDBOX: "container"
+      HELIX_NETWORK_POLICY: "deny"
+      HELIX_FILESYSTEM_POLICY: "isolated"
+      HELIX_RAW_KEYS_DENIED: "true"
+      HELIX_PRIVILEGE_RESTRICTED: "true"

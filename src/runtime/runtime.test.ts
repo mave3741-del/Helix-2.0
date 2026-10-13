@@ -101,3 +101,16 @@ test("fibonacci sandbox actually runs tests", async () => {
   assert.equal(result.evidence, "code-run-pass");
   assert.match(result.stdout, /passed/);
 });
+
+test("fast trading path rejects stale data and emits deterministic signals without LLM calls", async () => {
+  const { emitFastSignal, canPassFastRisk, totalFastPathBudgetMs } = await import("../trading/latency.ts");
+  const now = Date.now();
+  const tick = { symbol: "BTCUSDT", venue: "demo", market: "crypto" as const, bid: 100, ask: 100.01, last: 100.01, bidSize: 900, askSize: 100, sequence: 1, exchangeTs: now - 5, receivedTs: now };
+  const signal = emitFastSignal(tick, now);
+  assert.equal(signal.side, "buy");
+  assert.ok(signal.strength > 0);
+  assert.ok(totalFastPathBudgetMs() <= 10);
+  assert.equal(canPassFastRisk(1000, signal, { dailyCapitalLimit: 10000, allocatedCapital: 0, maxPositionNotional: 5000, maxPortfolioDrawdown: 0.05, killSwitch: false, staleAfterMs: 50 }, tick, now), true);
+  const stale = emitFastSignal({ ...tick, exchangeTs: now - 1000 }, now);
+  assert.equal(stale.side, "flat");
+});

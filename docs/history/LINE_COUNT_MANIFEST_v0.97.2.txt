@@ -1,0 +1,4 @@
+v0.97.2
+TypeScript/TSX: 30851 lines across 313 files
+JavaScript/JSX/MJS/CJS: 5511 lines across 44 files
+Combined counted source: 36362 lines across 357 files
